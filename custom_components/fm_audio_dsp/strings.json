@@ -3,9 +3,9 @@
     "step": {
       "user": {
         "title": "FM-Audio DSP",
-        "description": "Configure local Telnet control for an FM-Audio DSP. SofaBaton X2 MQTT mapping is optional.",
+        "description": "Configure local Telnet control for one or more FM-Audio DSPs. Enter multiple DSP IP addresses separated by commas or new lines. SofaBaton X2 MQTT mapping is optional.",
         "data": {
-          "dsp_host": "DSP IP address",
+          "dsp_hosts": "DSP IP address(es)",
           "dsp_port": "DSP Telnet port",
           "preset_count": "Number of preset buttons",
           "dsp_pin": "DSP PIN code (optional)",
@@ -19,7 +19,8 @@
       }
     },
     "error": {
-      "invalid_json": "Invalid JSON"
+      "invalid_json": "Invalid JSON",
+      "no_hosts": "Enter at least one DSP IP address"
     }
   }
 }

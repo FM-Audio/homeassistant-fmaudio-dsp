@@ -25,8 +25,10 @@ This makes the DSP available not only to SofaBaton X2 users, but also to Home As
 
 - Home Assistant UI setup via config flow
 - Local DSP control over Telnet
-- Configurable DSP host, Telnet port, optional PIN and preset count
+- Configurable DSP host(s), Telnet port, optional PIN and preset count
+- Multiple DSP IP addresses can be entered comma-separated or one per line
 - Preset buttons: `Preset 1` ... `Preset N` with N from 2 to 100
+- With multiple hosts in one config entry, Home Assistant exposes `All ...` buttons plus per-DSP host buttons
 - Utility buttons:
   - `Standby`
   - `Wake`
@@ -93,7 +95,7 @@ Settings → Devices & services → Add integration → FM-Audio DSP
 
 Recommended first setup values:
 
-- DSP host: the IP address of the DSP, for example `192.168.178.192`
+- DSP host(s): one or more IP addresses of the DSPs, for example `192.168.178.192`; separate multiple hosts with commas or new lines
 - DSP Telnet port: `23`
 - Preset count: `4` for a simple customer layout, or up to `100`
 - DSP PIN: leave empty unless the DSP requires a PIN
@@ -163,9 +165,9 @@ data:
   command: LOCATE
 ```
 
-### Target a specific DSP entry
+### Target a specific DSP entry or host
 
-If multiple DSP devices are configured, pass the Home Assistant config entry ID:
+If multiple DSP devices are configured as separate entries, pass the Home Assistant config entry ID:
 
 ```yaml
 service: fm_audio_dsp.send_preset
@@ -174,7 +176,17 @@ data:
   preset: 2
 ```
 
-If `entry_id` is omitted, all configured FM-Audio DSP entries receive the command.
+If multiple DSP hosts are configured inside one entry, pass `target_host` to address only one of them:
+
+```yaml
+service: fm_audio_dsp.send_command
+data:
+  entry_id: "01HZYEXAMPLE"
+  target_host: "192.168.178.193"
+  command: PRESET_1
+```
+
+If `target_host` is omitted, every DSP host in the selected entry receives the command. If `entry_id` is also omitted, all configured FM-Audio DSP entries receive the command.
 
 ## Events for debugging
 

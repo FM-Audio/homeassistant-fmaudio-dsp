@@ -8,6 +8,12 @@ send_preset:
       example: "01HZY..."
       selector:
         text:
+    target_host:
+      name: Target DSP host
+      description: Optional DSP IP address within the selected entry. If omitted, every DSP host in the selected entry receives the command.
+      example: "192.168.178.192"
+      selector:
+        text:
     preset:
       name: Preset
       description: Preset number to load.
@@ -25,6 +31,12 @@ send_command:
     entry_id:
       name: Config entry ID
       description: Optional config entry ID. If omitted, all configured DSP entries receive the command.
+      selector:
+        text:
+    target_host:
+      name: Target DSP host
+      description: Optional DSP IP address within the selected entry. If omitted, every DSP host in the selected entry receives the command.
+      example: "192.168.178.192"
       selector:
         text:
     command:

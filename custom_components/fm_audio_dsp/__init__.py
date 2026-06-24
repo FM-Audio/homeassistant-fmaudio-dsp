@@ -20,7 +20,7 @@ from .const import (
     DOMAIN,
     EXTRA_COMMANDS,
     MAX_PRESETS,
-    MIN_PRESETS,
+    MIN_PRESET_NUMBER,
     PLATFORMS,
 )
 
@@ -30,9 +30,22 @@ SERVICE_SEND_PRESET = "send_preset"
 SERVICE_SEND_COMMAND = "send_command"
 ATTR_ENTRY_ID = "entry_id"
 ATTR_PRESET = "preset"
+ATTR_TARGET_HOST = "target_host"
 
-SEND_PRESET_SCHEMA = vol.Schema({vol.Optional(ATTR_ENTRY_ID): cv.string, vol.Required(ATTR_PRESET): vol.All(int, vol.Range(min=MIN_PRESETS, max=MAX_PRESETS))})
-SEND_COMMAND_SCHEMA = vol.Schema({vol.Optional(ATTR_ENTRY_ID): cv.string, vol.Required(CONF_COMMAND): vol.In([*[f"PRESET_{i}" for i in range(MIN_PRESETS, MAX_PRESETS + 1)], *EXTRA_COMMANDS])})
+SEND_PRESET_SCHEMA = vol.Schema(
+    {
+        vol.Optional(ATTR_ENTRY_ID): cv.string,
+        vol.Optional(ATTR_TARGET_HOST): cv.string,
+        vol.Required(ATTR_PRESET): vol.All(int, vol.Range(min=MIN_PRESET_NUMBER, max=MAX_PRESETS)),
+    }
+)
+SEND_COMMAND_SCHEMA = vol.Schema(
+    {
+        vol.Optional(ATTR_ENTRY_ID): cv.string,
+        vol.Optional(ATTR_TARGET_HOST): cv.string,
+        vol.Required(CONF_COMMAND): vol.In([*[f"PRESET_{i}" for i in range(MIN_PRESET_NUMBER, MAX_PRESETS + 1)], *EXTRA_COMMANDS]),
+    }
+)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -59,22 +72,30 @@ async def _async_setup_services(hass: HomeAssistant) -> None:
 
     async def _apis_for_call(call: ServiceCall) -> list[FMAudioDspApi]:
         entry_id = call.data.get(ATTR_ENTRY_ID)
+        target_host = call.data.get(ATTR_TARGET_HOST)
         entries = hass.data.get(DOMAIN, {})
         if entry_id:
             if entry_id not in entries:
                 raise HomeAssistantError(f"Unknown FM-Audio DSP entry_id: {entry_id}")
             return [entries[entry_id]["api"]]
-        return [entry["api"] for entry in entries.values()]
+        apis = [entry["api"] for entry in entries.values()]
+        if target_host:
+            apis = [api for api in apis if target_host in api.hosts]
+            if not apis:
+                raise HomeAssistantError(f"Unknown FM-Audio DSP target_host: {target_host}")
+        return apis
 
     async def handle_send_preset(call: ServiceCall) -> None:
         preset = int(call.data[ATTR_PRESET])
+        target_host = call.data.get(ATTR_TARGET_HOST)
         for api in await _apis_for_call(call):
-            await api.async_send_preset(preset)
+            await api.async_send_preset(preset, target_host=target_host)
 
     async def handle_send_command(call: ServiceCall) -> None:
         command = str(call.data[CONF_COMMAND])
+        target_host = call.data.get(ATTR_TARGET_HOST)
         for api in await _apis_for_call(call):
-            await api.async_send_command(command)
+            await api.async_send_command(command, target_host=target_host)
 
     hass.services.async_register(DOMAIN, SERVICE_SEND_PRESET, handle_send_preset, schema=SEND_PRESET_SCHEMA)
     hass.services.async_register(DOMAIN, SERVICE_SEND_COMMAND, handle_send_command, schema=SEND_COMMAND_SCHEMA)

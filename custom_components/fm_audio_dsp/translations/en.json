@@ -1,0 +1,13 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "FM-Audio DSP",
+        "description": "Configure local Telnet control for an FM-Audio DSP. SofaBaton X2 MQTT mapping is optional."
+      }
+    },
+    "error": {
+      "invalid_json": "Invalid JSON"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "FM-Audio DSP",
+        "description": "Lokale Telnet-Steuerung für einen FM-Audio DSP konfigurieren. SofaBaton-X2-MQTT-Mapping ist optional.",
+        "data": {
+          "dsp_host": "DSP-IP-Adresse",
+          "dsp_port": "DSP-Telnet-Port",
+          "preset_count": "Anzahl Preset-Buttons",
+          "dsp_pin": "DSP-PIN-Code (optional)",
+          "command_value": "DSP-Command-Value",
+          "timeout": "TCP-Timeout in Sekunden",
+          "delay": "Pause zwischen Telnet-Zeilen in Sekunden",
+          "x2_mqtt_topic": "SofaBaton-X2-MQTT-Topic (optional)",
+          "x2_device_id": "SofaBaton-X2-device_id-Filter (optional)",
+          "x2_key_map": "SofaBaton-X2-Key-Map als JSON"
+        }
+      }
+    },
+    "error": {
+      "invalid_json": "Ungültiges JSON"
+    }
+  }
+}
